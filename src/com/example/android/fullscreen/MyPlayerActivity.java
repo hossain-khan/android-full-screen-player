@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
@@ -19,6 +20,17 @@ import android.support.v4.app.NavUtils;
  * @see SystemUiHider
  */
 public class MyPlayerActivity extends Activity {
+	/**
+	 * Log tag.
+	 */
+	private static final String LOG_TAG = MyPlayerActivity.class
+			.getSimpleName();
+
+	/**
+	 * Bundle key for content URL.
+	 */
+	public static final String BUNDLE_KEY_CONTENT_URL = "bundle_content_url";
+
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -47,9 +59,17 @@ public class MyPlayerActivity extends Activity {
 	 */
 	private SystemUiHider mSystemUiHider;
 
+	/**
+	 * Content URL for playing.
+	 */
+	private String mContentUrl = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		mContentUrl = getIntent().getStringExtra(BUNDLE_KEY_CONTENT_URL);
+		Log.d(LOG_TAG, "onCreate() : Got content URL to play: " + mContentUrl);
 
 		setContentView(R.layout.activity_my_player);
 		setupActionBar();
