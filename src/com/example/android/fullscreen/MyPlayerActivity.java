@@ -1,26 +1,36 @@
 package com.example.android.fullscreen;
 
+import com.example.android.fullscreen.util.SystemUiHider;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.example.android.fullscreen.util.SystemUiHider;
+import android.view.MenuItem;
+import android.support.v4.app.NavUtils;
 
 /**
- * <p>
- * Auto generated full-screen activity class. Left here AS-IS for reference. For
- * customized actvity, see {@link MyPlayerActivity}.
- * </p>
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  * 
  * @see SystemUiHider
  */
-public class FullscreenActivity extends Activity {
+public class MyPlayerActivity extends Activity {
+	/**
+	 * Log tag.
+	 */
+	private static final String LOG_TAG = MyPlayerActivity.class
+			.getSimpleName();
+
+	/**
+	 * Bundle key for content URL.
+	 */
+	public static final String BUNDLE_KEY_CONTENT_URL = "bundle_content_url";
+
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -49,11 +59,20 @@ public class FullscreenActivity extends Activity {
 	 */
 	private SystemUiHider mSystemUiHider;
 
+	/**
+	 * Content URL for playing.
+	 */
+	private String mContentUrl = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_fullscreen);
+		mContentUrl = getIntent().getStringExtra(BUNDLE_KEY_CONTENT_URL);
+		Log.d(LOG_TAG, "onCreate() : Got content URL to play: " + mContentUrl);
+
+		setContentView(R.layout.activity_my_player);
+		setupActionBar();
 
 		final View controlsView = findViewById(R.id.fullscreen_content_controls);
 		final View contentView = findViewById(R.id.fullscreen_content);
@@ -130,6 +149,36 @@ public class FullscreenActivity extends Activity {
 		// created, to briefly hint to the user that UI controls
 		// are available.
 		delayedHide(100);
+	}
+
+	/**
+	 * Set up the {@link android.app.ActionBar}, if the API is available.
+	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private void setupActionBar() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			// Show the Up button in the action bar.
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			// This ID represents the Home or Up button. In the case of this
+			// activity, the Up button is shown. Use NavUtils to allow users
+			// to navigate up one level in the application structure. For
+			// more details, see the Navigation pattern on Android Design:
+			//
+			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
+			//
+			// TODO: If Settings has multiple levels, Up should navigate up
+			// that hierarchy.
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	/**
