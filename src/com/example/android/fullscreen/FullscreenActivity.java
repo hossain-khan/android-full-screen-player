@@ -11,6 +11,10 @@ import android.view.View;
 import com.example.android.fullscreen.util.SystemUiHider;
 
 /**
+ * <p>
+ * Auto generated full-screen activity class. Left here AS-IS for reference. For
+ * customized actvity, see {@link MyPlayerActivity}.
+ * </p>
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  * 
