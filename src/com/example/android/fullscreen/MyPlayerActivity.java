@@ -1,17 +1,26 @@
 package com.example.android.fullscreen;
 
-import com.example.android.fullscreen.util.SystemUiHider;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.widget.Toast;
+
+import com.example.android.fullscreen.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -19,7 +28,9 @@ import android.support.v4.app.NavUtils;
  * 
  * @see SystemUiHider
  */
-public class MyPlayerActivity extends Activity {
+public class MyPlayerActivity extends Activity implements
+		OnBufferingUpdateListener, OnCompletionListener, OnPreparedListener,
+		OnVideoSizeChangedListener, SurfaceHolder.Callback {
 	/**
 	 * Log tag.
 	 */
@@ -64,6 +75,15 @@ public class MyPlayerActivity extends Activity {
 	 */
 	private String mContentUrl = null;
 
+	private int mVideoWidth;
+	private int mVideoHeight;
+	private MediaPlayer mMediaPlayer;
+	private SurfaceView mPreview;
+	private SurfaceHolder holder;
+	private boolean mIsVideoSizeKnown = false;
+	private boolean mIsVideoReadyToBePlayed = false;
+
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,8 +94,13 @@ public class MyPlayerActivity extends Activity {
 		setContentView(R.layout.activity_my_player);
 		setupActionBar();
 
+		mPreview = (SurfaceView) findViewById(R.id.surface);
+		holder = mPreview.getHolder();
+		holder.addCallback(this);
+		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
 		final View controlsView = findViewById(R.id.fullscreen_content_controls);
-		final View contentView = findViewById(R.id.fullscreen_content);
+		final View contentView = mPreview;
 
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
@@ -139,6 +164,20 @@ public class MyPlayerActivity extends Activity {
 		// while interacting with the UI.
 		findViewById(R.id.dummy_button).setOnTouchListener(
 				mDelayHideTouchListener);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		releaseMediaPlayer();
+		doCleanUp();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		releaseMediaPlayer();
+		doCleanUp();
 	}
 
 	@Override
@@ -211,5 +250,111 @@ public class MyPlayerActivity extends Activity {
 	private void delayedHide(int delayMillis) {
 		mHideHandler.removeCallbacks(mHideRunnable);
 		mHideHandler.postDelayed(mHideRunnable, delayMillis);
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		Log.d(LOG_TAG, "surfaceChanged called");
+
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		Log.d(LOG_TAG, "surfaceCreated called");
+		playVideo();
+
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		Log.d(LOG_TAG, "surfaceDestroyed called");
+
+	}
+
+	@Override
+	public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+		Log.v(LOG_TAG, "onVideoSizeChanged called");
+		if (width == 0 || height == 0) {
+			Log.e(LOG_TAG, "invalid video width(" + width + ") or height("
+					+ height + ")");
+			return;
+		}
+		mIsVideoSizeKnown = true;
+		mVideoWidth = width;
+		mVideoHeight = height;
+		if (mIsVideoReadyToBePlayed && mIsVideoSizeKnown) {
+			startVideoPlayback();
+		}
+
+	}
+
+	@Override
+	public void onPrepared(MediaPlayer mp) {
+		Log.d(LOG_TAG, "onPrepared called");
+		mIsVideoReadyToBePlayed = true;
+		if (mIsVideoReadyToBePlayed && mIsVideoSizeKnown) {
+			startVideoPlayback();
+		}
+
+	}
+
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		Log.d(LOG_TAG, "onCompletion called");
+		Toast.makeText(this, "Playback finished.", Toast.LENGTH_SHORT).show();
+		// Exit view.
+		finish();
+
+	}
+
+	@Override
+	public void onBufferingUpdate(MediaPlayer mp, int percent) {
+		Log.d(LOG_TAG, "onBufferingUpdate percent:" + percent);
+
+	}
+
+	//
+	// Private methods for dealing with player
+	//
+
+	private void releaseMediaPlayer() {
+		if (mMediaPlayer != null) {
+			mMediaPlayer.release();
+			mMediaPlayer = null;
+		}
+	}
+
+	private void doCleanUp() {
+		mVideoWidth = 0;
+		mVideoHeight = 0;
+		mIsVideoReadyToBePlayed = false;
+		mIsVideoSizeKnown = false;
+	}
+
+	private void startVideoPlayback() {
+		Log.v(LOG_TAG, "startVideoPlayback");
+		holder.setFixedSize(mVideoWidth, mVideoHeight);
+		mMediaPlayer.start();
+	}
+
+	private void playVideo() {
+		doCleanUp();
+		try {
+
+			// Create a new media player and set the listeners
+			mMediaPlayer = new MediaPlayer();
+			mMediaPlayer.setDataSource(mContentUrl);
+			mMediaPlayer.setDisplay(holder);
+			mMediaPlayer.prepare();
+			mMediaPlayer.setOnBufferingUpdateListener(this);
+			mMediaPlayer.setOnCompletionListener(this);
+			mMediaPlayer.setOnPreparedListener(this);
+			mMediaPlayer.setOnVideoSizeChangedListener(this);
+			mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+		} catch (Exception e) {
+			Log.e(LOG_TAG, "error: " + e.getMessage(), e);
+		}
 	}
 }

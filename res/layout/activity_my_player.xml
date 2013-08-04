@@ -11,16 +11,13 @@
          TextureView, etc.
     -->
 
-    <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+	<SurfaceView android:id="@+id/surface"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+        android:layout_gravity="center">
+    </SurfaceView>
 
     <!--
          This FrameLayout insets its children based on system windows using

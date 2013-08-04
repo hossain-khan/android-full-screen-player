@@ -14,7 +14,11 @@ public class AppHomeActivity extends Activity {
 	 */
 	private static final String LOG_TAG = AppHomeActivity.class.getSimpleName();
 
-	private static final String PLAYABLE_CONTENT_URL = "http://www.youtube.com/playsomething.mp4";
+	/**
+	 * Big Buck Bunny Trailer Video - Licese: Creative Commons Attribution 3.0 <br>
+	 * Credits: Blender.org, see more info at - http://www.bigbuckbunny.org/
+	 */
+	private static final String PLAYABLE_CONTENT_URL = "http://mirror.cessen.com/blender.org/peach/trailer/trailer_iphone.m4v";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +39,8 @@ public class AppHomeActivity extends Activity {
 			Log.d(LOG_TAG, "onViewClicked() : btn_launch_player.");
 			// Launch the player activity
 			Intent intent = new Intent(this, MyPlayerActivity.class);
-			intent.putExtra(MyPlayerActivity.BUNDLE_KEY_CONTENT_URL, PLAYABLE_CONTENT_URL);
+			intent.putExtra(MyPlayerActivity.BUNDLE_KEY_CONTENT_URL,
+					PLAYABLE_CONTENT_URL);
 			startActivity(intent);
 			break;
 
