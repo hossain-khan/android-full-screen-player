@@ -14,7 +14,7 @@ public class AppHomeActivity extends Activity {
 	 */
 	private static final String LOG_TAG = AppHomeActivity.class.getSimpleName();
 
-	private static final String PLAYABLE_CONTENT_URL = "http://www.youtube.com/playsomething.mp4";
+	private static final String PLAYABLE_CONTENT_URL = "http://mirror.cessen.com/blender.org/peach/trailer/trailer_iphone.m4v";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
