@@ -35,14 +35,21 @@ public class AppHomeActivity extends Activity {
 
 	public void onViewClicked(View view) {
 		switch (view.getId()) {
-		case R.id.btn_launch_player:
-			Log.d(LOG_TAG, "onViewClicked() : btn_launch_player.");
+		case R.id.btn_launch_fullscreen_player:
+			Log.d(LOG_TAG, "onViewClicked() : btn_launch_fullscreen_player.");
 			// Launch the player activity
 			Intent intent = new Intent(this, MyPlayerActivity.class);
 			intent.putExtra(MyPlayerActivity.BUNDLE_KEY_CONTENT_URL,
 					PLAYABLE_CONTENT_URL);
 			startActivity(intent);
 			break;
+		case R.id.btn_launch_embed_player:
+			Log.d(LOG_TAG, "onViewClicked() : btn_launch_embed_player.");
+			// Launch the player activity
+			Intent intentEmbed = new Intent(this, MyEmbedPlayerActivity.class);
+			intentEmbed.putExtra(MyPlayerActivity.BUNDLE_KEY_CONTENT_URL,
+					PLAYABLE_CONTENT_URL);
+			startActivity(intentEmbed);
 
 		default:
 			Log.d(LOG_TAG, "onViewClicked() : Not handled.");

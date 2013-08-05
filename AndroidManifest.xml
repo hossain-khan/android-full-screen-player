@@ -7,7 +7,7 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -36,6 +36,14 @@
             android:label="@string/title_activity_my_player"
             android:parentActivityName="com.example.android.fullscreen.AppHomeActivity"
             android:theme="@style/FullscreenTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.fullscreen.AppHomeActivity" />
+        </activity>
+        <activity
+            android:name="com.example.android.fullscreen.MyEmbedPlayerActivity"
+            android:label="@string/title_activity_my_embed_player"
+            android:parentActivityName="com.example.android.fullscreen.AppHomeActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.fullscreen.AppHomeActivity" />
